@@ -1,4 +1,5 @@
 using Domain.Interfaces;
+using Domain.Entities;
 using Infrastructure.Messaging;
 using Infrastructure.Persistence;
 using Application.Services;
@@ -23,6 +24,7 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 // Register services (Application Layer)
 builder.Services.AddScoped<ITraderService, TraderService>();
+builder.Services.AddSingleton<INotificationService, NotificationService>();
 
 // Register RabbitMQ services
 builder.Services.AddSingleton<IMessagingPublisher>(sp =>
@@ -31,15 +33,35 @@ builder.Services.AddSingleton<IMessagingPublisher>(sp =>
         username: "guest",
         password: "guest"
     ));
-
-builder.Services.AddSingleton<IMessagingConsumer>(sp =>
-    new RabbitMqConsumer(
+builder.Services.AddSingleton<IMessagingConsumer, NotificationConsumer>(sp =>
+    new NotificationConsumer(
         hostname: "localhost",
         username: "guest",
         password: "guest"
     ));
 
 var app = builder.Build();
+
+// Configure the consumer to use NotificationService
+var notificationService = app.Services.GetService<INotificationService>();
+if (notificationService != null)
+{
+    var consumer = app.Services.GetService<IMessagingConsumer>();
+    Task.Run(() =>
+    {
+        consumer?.StartConsumingAsync("order_placed_queue", async message =>
+        {
+            var notification = new Notification
+            {
+                Type = "OrderPlaced",
+                Message = message,
+                Timestamp = DateTime.UtcNow
+            };
+
+            await notificationService.AddNotificationAsync(notification);
+        }, CancellationToken.None);
+    });
+}
 
 // Map controllers
 app.MapControllers();

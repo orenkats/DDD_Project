@@ -55,6 +55,13 @@ public class TraderService : ITraderService
 
         // Publish the order to the message queue
         await _messagingPublisher.PublishAsync("order_queue", order);
+
+        await _messagingPublisher.PublishAsync("notifications", new
+        {
+            Type = "OrderPlaced",
+            Message = $"Order placed for trader {traderId} on stock {stockSymbol}",
+            Timestamp = DateTime.UtcNow
+        });
     }
 
     /// <summary>
