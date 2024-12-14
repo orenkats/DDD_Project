@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <!-- Entity Framework Core for persistence -->
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
     <!-- RabbitMQ client for messaging -->
     <PackageReference Include="RabbitMQ.Client" Version="6.5.2" />
