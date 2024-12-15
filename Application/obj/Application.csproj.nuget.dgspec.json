@@ -48,6 +48,14 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "AWSSDK.DynamoDBv2": {
+              "target": "Package",
+              "version": "[3.7.404.5, )"
+            },
+            "AWSSDK.S3": {
+              "target": "Package",
+              "version": "[3.7.410.6, )"
+            },
             "Microsoft.AspNetCore.Mvc.Abstractions": {
               "target": "Package",
               "version": "[2.2.0, )"
