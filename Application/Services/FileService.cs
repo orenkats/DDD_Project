@@ -1,13 +1,13 @@
+using Domain.Interfaces;
+using Domain.Entities;
+using Application.Interfaces;
+using System.Text;
+using System.IO;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+
 namespace Application.Services
 {
-    using Domain.Interfaces;
-    using Domain.Entities;
-    using Application.Interfaces;
-    using System.Text;
-    using System.IO;
-    using System.Threading.Tasks;
-    using System.Collections.Generic;
-
     public class FileService : IFileService
     {
         private readonly IFileStorageService _fileStorageService;
