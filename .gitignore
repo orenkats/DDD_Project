@@ -6,3 +6,7 @@
 
 # Include only .cs files
 !**/*.cs
+
+# Explicitly ignore bin and obj folders
+bin/
+obj/
