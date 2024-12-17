@@ -1,0 +1,8 @@
+# Ignore everything by default
+*
+
+# Do not ignore folders (keep the structure intact)
+!*/
+
+# Include only .cs files
+!**/*.cs
