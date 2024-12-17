@@ -17,7 +17,7 @@ namespace Infrastructure.Services
             _s3Client = s3Client;
         }
 
-        public async Task<string> UploadFileAsync(string fileKey, Stream fileStream, string contentType, string userId)
+        public async Task<string> UploadFileAsync(string fileKey, Stream fileStream, string contentType, Guid traderId)
         {
             var request = new PutObjectRequest
             {
@@ -25,7 +25,7 @@ namespace Infrastructure.Services
                 Key = fileKey,
                 InputStream = fileStream,
                 ContentType = contentType,
-                Metadata = { ["UserId"] = userId }
+                Metadata = { ["traderId"] = traderId.ToString() }
             };
 
             await _s3Client.PutObjectAsync(request);
@@ -60,30 +60,6 @@ namespace Infrastructure.Services
             {
                 return false;
             }
-        }
-
-        public async Task<List<FileMetadata>> ListFilesAsync(string userId)
-        {
-            var request = new ListObjectsV2Request
-            {
-                BucketName = "your-bucket-name",
-                Prefix = $"{userId}/"
-            };
-
-            var response = await _s3Client.ListObjectsV2Async(request);
-            var files = new List<FileMetadata>();
-
-            foreach (var s3Object in response.S3Objects)
-            {
-                files.Add(new FileMetadata
-                {
-                    Key = s3Object.Key,
-                    Size = s3Object.Size,
-                    LastModified = s3Object.LastModified
-                });
-            }
-
-            return files;
         }
     }
 }

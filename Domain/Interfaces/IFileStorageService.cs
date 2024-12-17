@@ -8,9 +8,9 @@ namespace Domain.Interfaces
 
     public interface IFileStorageService
     {
-        Task<string> UploadFileAsync(string fileKey, Stream fileStream, string contentType, string userId);
+        Task<string> UploadFileAsync(string fileKey, Stream fileStream, string contentType, Guid traderId);
         Task<Stream?> DownloadFileAsync(string fileKey);
         Task<bool> FileExistsAsync(string fileKey);
-        Task<List<FileMetadata>> ListFilesAsync(string userId);
+        
     }
 }

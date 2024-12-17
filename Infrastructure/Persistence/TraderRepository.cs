@@ -40,4 +40,13 @@ public class TraderRepository : ITraderRepository
         _dbContext.Traders.Remove(trader);
         await _dbContext.SaveChangesAsync();
     }
+    // Implement GetOrdersByTraderIdAsync
+    public async Task<List<StockOrder>> GetOrdersByTraderIdAsync(Guid traderId)
+    {
+        var trader = await _dbContext.Traders
+            .Include(t => t.Orders)
+            .FirstOrDefaultAsync(t => t.Id == traderId);
+
+        return trader?.Orders ?? new List<StockOrder>();
+    }
 }

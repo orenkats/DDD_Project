@@ -1,9 +1,11 @@
-using Domain.Interfaces;
-using Domain.Entities;
-using Infrastructure.Messaging;
-using Infrastructure.Persistence;
-using Application.Services;
 using Application.Interfaces;
+using Application.Services;
+using Application.Validations;
+using Domain.Interfaces;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Infrastructure.Persistence;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,48 +25,19 @@ builder.Services.AddScoped<ITraderRepository, TraderRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 // Register services (Application Layer)
-builder.Services.AddScoped<ITraderService, TraderService>();
-builder.Services.AddSingleton<INotificationService, NotificationService>();
+builder.Services.AddScoped<ITraderManagement, TraderManagementService>();
+builder.Services.AddScoped<ITraderActions, TraderActionsService>();
+builder.Services.AddScoped<IFileService, FileService>();
 
-// Register RabbitMQ services
-builder.Services.AddSingleton<IMessagingPublisher>(sp =>
-    new RabbitMqPublisher(
-        hostname: "localhost",
-        username: "guest",
-        password: "guest"
-    ));
-builder.Services.AddSingleton<IMessagingConsumer, NotificationConsumer>(sp =>
-    new NotificationConsumer(
-        hostname: "localhost",
-        username: "guest",
-        password: "guest"
-    ));
+// Register S3 services
+builder.Services.AddSingleton<IFileStorageService, S3FileStorageService>();
+
+// Add FluentValidation
+builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<TraderValidator>();
 
 var app = builder.Build();
 
-// Configure the consumer to use NotificationService
-var notificationService = app.Services.GetService<INotificationService>();
-if (notificationService != null)
-{
-    var consumer = app.Services.GetService<IMessagingConsumer>();
-    Task.Run(() =>
-    {
-        consumer?.StartConsumingAsync("order_placed_queue", async message =>
-        {
-            var notification = new Notification
-            {
-                Type = "OrderPlaced",
-                Message = message,
-                Timestamp = DateTime.UtcNow
-            };
-
-            await notificationService.AddNotificationAsync(notification);
-        }, CancellationToken.None);
-    });
-}
-
-// Map controllers
+// Configure HTTP request pipeline
 app.MapControllers();
-app.MapGet("/", () => "Welcome to the RabbitMQ API!");
-
 app.Run();

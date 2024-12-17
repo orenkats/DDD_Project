@@ -11,16 +11,15 @@ public class MessageController : ControllerBase
 {
     private readonly IMessagingPublisher _publisher;
     private readonly IMessagingConsumer _consumer;
-    private readonly ITraderService _traderService; // Declare the dependency
-
+   
     public MessageController(
         IMessagingPublisher publisher,
-        IMessagingConsumer consumer,
-        ITraderService traderService) // Inject the dependency
+        IMessagingConsumer consumer)
+        // Inject the dependency
     {
         _publisher = publisher;
         _consumer = consumer;
-        _traderService = traderService; // Assign the dependency
+         // Assign the dependency
     }
 
     public class QueueRequest
@@ -70,33 +69,5 @@ public class MessageController : ControllerBase
 
         return Ok($"Started listening to queue: {request.QueueName}");
     }
-
-    [HttpGet("test-db")]
-    public async Task<IActionResult> TestDatabase()
-    {
-        try
-        {
-            // Fetch all traders
-            var traders = await _traderService.GetAllTradersAsync();
-            return Ok(traders);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Database error: {ex.Message}");
-        }
-    }
-
-    [HttpPost("add-trader")]
-    public async Task<IActionResult> AddTrader([FromBody] Trader trader)
-    {
-        try
-        {
-            await _traderService.AddTraderAsync(trader);
-            return Ok("Trader added successfully.");
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Error adding trader: {ex.Message}");
-        }
-    }
+    
 }
