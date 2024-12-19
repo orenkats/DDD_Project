@@ -7,16 +7,19 @@ namespace Application.Validations
     {
         public TraderValidator()
         {
-            // Validate Name (must not be null or empty)
+            // Validate Name 
             RuleFor(trader => trader.Name)
                 .NotEmpty().WithMessage("Trader name is required.")
                 .MaximumLength(100).WithMessage("Trader name must not exceed 100 characters.");
 
-            // Validate AccountBalance (must be non-negative)
+            // Validate AccountBalance 
             RuleFor(trader => trader.AccountBalance)
                 .GreaterThanOrEqualTo(0).WithMessage("Account balance must be non-negative.");
 
-        
+            // Validate Email
+            RuleFor(trader => trader.Email)
+                .NotEmpty().WithMessage("Email is required.")
+                .EmailAddress().WithMessage("Invalid email format.");
         }
     }   
 }

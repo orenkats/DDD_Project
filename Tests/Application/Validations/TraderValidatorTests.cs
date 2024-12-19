@@ -9,7 +9,7 @@ namespace Tests.Application.Validations
     public class TraderValidatorTests
     {
         private TraderValidator _validator = null!;
-
+        
         [SetUp]
         public void Setup()
         {
@@ -20,8 +20,12 @@ namespace Tests.Application.Validations
         public void Validate_ValidTrader_ShouldPass()
         {
             // Arrange
-            var trader = new Trader { Name = "John Doe", AccountBalance = 1000m };
-
+            var trader = new Trader 
+            { 
+                Name = "John Doe", 
+                AccountBalance = 1000m, 
+                Email = "john.doe@example.com" 
+            };
             // Act
             var result = _validator.TestValidate(trader);
 
@@ -33,7 +37,12 @@ namespace Tests.Application.Validations
         public void Validate_EmptyName_ShouldFail()
         {
             // Arrange
-            var trader = new Trader { Name = "", AccountBalance = 1000m };
+            var trader = new Trader 
+            { 
+                Name = "", 
+                AccountBalance = 1000m,
+                Email = "john.doe@example.com"
+            };
 
             // Act
             var result = _validator.TestValidate(trader);
@@ -47,7 +56,12 @@ namespace Tests.Application.Validations
         public void Validate_NegativeAccountBalance_ShouldFail()
         {
             // Arrange
-            var trader = new Trader { Name = "John Doe", AccountBalance = -100m };
+            var trader = new Trader 
+            { 
+                Name = "John Doe", 
+                AccountBalance = -1000m,
+                Email = "john.doe@example.com"
+            };
 
             // Act
             var result = _validator.TestValidate(trader);
@@ -55,6 +69,25 @@ namespace Tests.Application.Validations
             // Assert
             result.ShouldHaveValidationErrorFor(t => t.AccountBalance)
                   .WithErrorMessage("Account balance must be non-negative.");
+        }
+
+        [Test]
+        public void Validate_InvalidEmail_ShouldFail()
+        {
+            // Arrange
+            var trader = new Trader 
+            { 
+                Name = "John Doe", 
+                AccountBalance = -1000m,
+                Email = ""
+            };
+
+            // Act
+            var result = _validator.TestValidate(trader);
+
+            // Assert
+            result.ShouldHaveValidationErrorFor(t => t.Email)
+                  .WithErrorMessage("Email is required.");
         }
     }
 }

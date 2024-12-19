@@ -7,8 +7,6 @@ namespace Application.Interfaces
     /// </summary>
     public interface ITraderActions
     {
-        
         Task PlaceOrderAsync(Guid traderId, string stockSymbol, int quantity, decimal price, string orderType);
-
     }
 }
